@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CMSConf Image Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dist/output.css">
+</head>
+<body class="font-sans bg-bg text-slate-50 min-h-dvh flex flex-col antialiased">
+
+<span id="font-preloader" aria-hidden="true">SPEAKER PARTNER ATTENDEE SPONSOR</span>
+
+<header class="h-[58px] px-5 border-b border-accent/10 bg-surface flex items-center justify-between shrink-0 gap-4">
+  <a href="https://cmsconf.com" target="_blank" rel="noopener noreferrer" class="flex items-center shrink-0" aria-label="CMSConf homepage">
+    <img src="data/images/logo.svg" alt="CMSConf" class="h-7 w-auto">
+  </a>
+  <a href="https://cmsconf.com" target="_blank" rel="noopener noreferrer"
+    class="inline-flex items-center gap-1.5 text-[0.8125rem] font-semibold text-muted no-underline px-3 py-1.5 border border-accent/10 rounded-full transition-colors hover:text-slate-50 hover:border-accent/30">
+    <span class="max-md:hidden">Visit cmsconf.com</span>
+    <svg class="size-3 shrink-0" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M2 10 10 2M5 2h5v5"/>
+    </svg>
+  </a>
+</header>
+
+<div class="flex-1 grid md:grid-cols-[320px_1fr] min-h-0 md:overflow-hidden isolate">
+
+  <div class="bg-surface border-b md:border-b-0 md:border-r border-accent/10 flex flex-col">
+    <div class="sidebar-scroll flex-1 overflow-y-auto p-5 flex flex-col gap-5">
+
+      <!-- Photo -->
+      <div class="flex flex-col gap-2.5">
+        <div class="text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Your Photo</div>
+        <div class="upload-zone border-[1.5px] border-dashed border-accent/15 rounded-xl p-6 text-center cursor-pointer relative bg-white/[0.02] transition-colors hover:border-accent/30 hover:bg-accent/10" id="uploadZone">
+          <input type="file" id="photoInput" accept="image/*" aria-label="Upload your photo" class="absolute inset-0 opacity-0 cursor-pointer size-full">
+          <div class="size-11 rounded-[10px] bg-accent/10 border border-accent/30 flex items-center justify-center mx-auto mb-3">
+            <svg class="size-5 text-accent" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10 12.5V4.5"/>
+              <path d="M7 7.5 10 4.5l3 3"/>
+              <path d="M3.5 13.5v1A1.5 1.5 0 0 0 5 16h10a1.5 1.5 0 0 0 1.5-1.5v-1"/>
+            </svg>
+          </div>
+          <p class="text-muted text-[0.8125rem] leading-6"><strong class="text-slate-50 font-semibold">Click to upload</strong> or drag &amp; drop</p>
+          <p class="text-[0.75rem] text-muted/60 mt-1">JPG, PNG, WebP &mdash; any size</p>
+        </div>
+      </div>
+
+      <!-- Photo Options: bg colour + scale (shown after upload) -->
+      <div id="photoOptions" class="flex flex-col gap-4" style="display:none">
+        <div class="h-px bg-accent/10 -mx-5"></div>
+
+        <!-- Background color — visible only for transparent PNGs -->
+        <div id="bgColorSection" class="flex flex-col gap-2.5" style="display:none">
+          <div class="text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Background Color</div>
+          <div class="flex gap-2 flex-wrap items-center" id="bgColorPicker"></div>
+        </div>
+
+        <!-- Scale slider -->
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center justify-between">
+            <div class="text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Photo Scale</div>
+            <span id="scaleDisplay" class="text-[0.6875rem] font-mono font-semibold text-accent">100%</span>
+          </div>
+          <input type="range" id="scaleSlider" min="50" max="150" value="100" step="1"
+            class="w-full cursor-pointer accent-[#3CFFD0]">
+        </div>
+
+        <!-- Monochrome toggle -->
+        <div class="flex items-center justify-between">
+          <div class="text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Monochrome</div>
+          <button type="button" id="monochromeToggle"
+            role="switch" aria-checked="false"
+            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 bg-white/10">
+            <span class="pointer-events-none inline-block size-[18px] translate-x-0 rounded-full bg-muted shadow-lg transition-transform duration-200"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="h-px bg-accent/10 -mx-5"></div>
+
+      <!-- Role -->
+      <div class="flex flex-col gap-2.5">
+        <div class="text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Role</div>
+        <div class="grid grid-cols-2 gap-1.5">
+          <button type="button" class="role-btn active bg-white/[0.03] border-[1.5px] border-accent/10 rounded-lg text-muted py-2.5 text-[0.75rem] font-bold tracking-[0.08em] uppercase transition-all leading-none min-h-11 hover:border-accent/30 hover:text-slate-50 hover:bg-accent/[0.04]" data-role="SPEAKER">Speaker</button>
+          <button type="button" class="role-btn bg-white/[0.03] border-[1.5px] border-accent/10 rounded-lg text-muted py-2.5 text-[0.75rem] font-bold tracking-[0.08em] uppercase transition-all leading-none min-h-11 hover:border-accent/30 hover:text-slate-50 hover:bg-accent/[0.04]" data-role="PARTNER">Partner</button>
+          <button type="button" class="role-btn bg-white/[0.03] border-[1.5px] border-accent/10 rounded-lg text-muted py-2.5 text-[0.75rem] font-bold tracking-[0.08em] uppercase transition-all leading-none min-h-11 hover:border-accent/30 hover:text-slate-50 hover:bg-accent/[0.04]" data-role="SPONSOR">Sponsor</button>
+          <button type="button" class="role-btn bg-white/[0.03] border-[1.5px] border-accent/10 rounded-lg text-muted py-2.5 text-[0.75rem] font-bold tracking-[0.08em] uppercase transition-all leading-none min-h-11 hover:border-accent/30 hover:text-slate-50 hover:bg-accent/[0.04]" data-role="ATTENDEE">Attendee</button>
+        </div>
+      </div>
+
+      <div class="h-px bg-accent/10 -mx-5"></div>
+
+      <!-- Themes -->
+      <div class="flex flex-col gap-2.5">
+        <div class="text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Color Theme</div>
+        <div class="grid grid-cols-2 gap-1.5" id="themeGrid"></div>
+      </div>
+
+    </div>
+
+    <div class="px-5 pt-4 pb-6 border-t border-accent/10">
+      <button type="button" id="downloadBtn"
+        class="bg-accent text-[#0F172A] rounded-[10px] py-3.5 px-5 text-sm font-bold w-full tracking-[0.03em] transition-all flex items-center justify-center gap-2 shadow-[0_0_28px_rgb(60_255_208_/_0.2)] min-h-12 hover:opacity-90 hover:-translate-y-px hover:shadow-[0_6px_32px_rgb(60_255_208_/_0.4)] active:translate-y-0 active:opacity-100">
+        <svg class="size-4 fill-current shrink-0" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10.5 3.5 6H6V1h4v5h2.5L8 10.5zM2 13h12v1.5H2V13z"/></svg>
+        Download Image
+      </button>
+    </div>
+  </div>
+
+  <div class="preview-area flex flex-col items-center justify-center p-8 max-md:p-6 max-md:min-h-[320px] bg-[#030B17] gap-4 overflow-hidden relative">
+    <!-- Outer div just for centering; inner div sizes to the canvas so overlays can use % coords -->
+    <div class="z-10 flex justify-center">
+      <div class="relative [line-height:0]">
+        <canvas id="canvas" width="1080" height="1080"
+          class="block max-w-[min(calc(100vw-360px),calc(100dvh-140px))] max-h-[calc(100dvh-140px)] max-md:max-w-[min(90vw,400px)] max-md:max-h-[400px] rounded-lg shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_24px_60px_rgba(0,0,0,0.7)]"></canvas>
+
+        <!-- Loading overlay -->
+        <div id="loadingOverlay" class="absolute inset-0 bg-[#030B17]/90 flex flex-col items-center justify-center rounded-lg gap-3 z-30">
+          <div class="size-7 border-[2.5px] border-accent/15 border-t-accent rounded-full animate-spin"></div>
+          <div class="text-muted text-[0.8125rem] font-medium">Loading template&hellip;</div>
+        </div>
+
+        <!-- Circle photo upload zone
+             Positioned to match canvas circle: cx=540 cy=540 r=325 on 1080×1080
+             → width/height = 650/1080 = 60.185%  top/left = 215/1080 = 19.907% -->
+        <div id="circleDropZone"
+          class="group absolute rounded-full overflow-hidden cursor-pointer border-2 border-dashed border-accent/20 transition-all z-20 hover:border-accent/50"
+          style="width:60.185%;height:60.185%;top:19.907%;left:19.907%">
+          <input type="file" id="circlePhotoInput" accept="image/*" aria-label="Upload your photo"
+            class="absolute inset-0 opacity-0 cursor-pointer size-full z-10">
+          <div class="circle-drop-inner absolute inset-0 flex flex-col items-center justify-center gap-2
+                      bg-[#030B17]/40 group-hover:bg-[#030B17]/60 transition-all">
+            <div class="size-[15%] min-w-10 max-w-16 min-h-10 max-h-16 rounded-full bg-accent/10 border border-accent/30 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+              <svg class="size-[45%] min-w-4 max-w-7 text-accent" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M10 12.5V4.5"/>
+                <path d="M7 7.5 10 4.5l3 3"/>
+                <path d="M3.5 13.5v1A1.5 1.5 0 0 0 5 16h10a1.5 1.5 0 0 0 1.5-1.5v-1"/>
+              </svg>
+            </div>
+            <p class="text-slate-50 text-[2.5%] min-text font-semibold [font-size:clamp(0.6rem,2.5%,0.9rem)] [text-shadow:0_2px_8px_rgba(0,0,0,0.9)]">Upload Photo</p>
+            <p class="text-muted/80 [font-size:clamp(0.55rem,2%,0.75rem)] [text-shadow:0_2px_8px_rgba(0,0,0,0.9)]">click or drag &amp; drop</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="text-[0.75rem] text-white/20 tracking-[0.02em] z-10">Preview &mdash; final export is full 1080&times;1080 px</div>
+  </div>
+
+</div>
+
+<!-- Share modal -->
+<div class="modal-backdrop fixed inset-0 bg-bg/85 backdrop-blur-md z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200"
+     id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+  <div class="modal-card bg-surface border border-accent/15 rounded-[20px] p-8 max-w-sm w-full relative shadow-[0_32px_80px_rgba(0,0,0,0.5)] translate-y-3 scale-[0.97] transition-transform duration-[250ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]">
+
+    <button type="button" id="closeModal" aria-label="Close"
+      class="absolute top-4 right-4 bg-white/[0.06] rounded-full size-8 flex items-center justify-center text-xl leading-none text-muted transition-colors hover:bg-white/[0.12] hover:text-slate-50">&times;</button>
+
+    <div class="size-14 rounded-2xl bg-accent/10 border border-accent/30 flex items-center justify-center mx-auto mb-5">
+      <svg class="size-6 text-accent" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M13 2v14M8 8l5-6 5 6"/>
+        <path d="M5 16v6h16v-6"/>
+      </svg>
+    </div>
+
+    <h2 id="shareModalTitle" class="text-xl font-extrabold text-center mb-2 tracking-tight">Image downloaded!</h2>
+    <p class="text-center text-muted text-sm leading-6 mb-6">
+      Share it on social media with&nbsp;<strong class="text-accent font-bold">#cmsconf</strong><br>
+      and let the world know you&rsquo;re part of it.
+    </p>
+
+    <div class="grid grid-cols-2 max-[400px]:grid-cols-1 gap-2 mb-5">
+      <a id="shareX" href="#" target="_blank" rel="noopener noreferrer"
+        class="flex items-center justify-center gap-2 py-3 rounded-[10px] text-[0.8125rem] font-bold no-underline transition-all tracking-[0.02em] min-h-12 bg-surface2 border border-accent/10 text-slate-50 hover:bg-white/[0.06] hover:-translate-y-px">
+        <svg class="size-[18px] fill-white shrink-0" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.23H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        X / Twitter
+      </a>
+      <a id="shareBluesky" href="#" target="_blank" rel="noopener noreferrer"
+        class="flex items-center justify-center gap-2 py-3 rounded-[10px] text-[0.8125rem] font-bold no-underline transition-all tracking-[0.02em] min-h-12 bg-surface2 border border-accent/10 text-slate-50 hover:bg-white/[0.06] hover:-translate-y-px">
+        <svg class="size-[18px] fill-[#0085FF] shrink-0" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.204-.659-.3-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8Z"/></svg>
+        Bluesky
+      </a>
+      <a id="shareLinkedIn" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fcmsconf.com" target="_blank" rel="noopener noreferrer"
+        class="flex items-center justify-center gap-2 py-3 rounded-[10px] text-[0.8125rem] font-bold no-underline transition-all tracking-[0.02em] min-h-12 bg-surface2 border border-accent/10 text-slate-50 hover:bg-white/[0.06] hover:-translate-y-px">
+        <svg class="size-[18px] fill-[#0A66C2] shrink-0" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        LinkedIn
+      </a>
+      <a id="shareFacebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fcmsconf.com&hashtag=%23cmsconf" target="_blank" rel="noopener noreferrer"
+        class="flex items-center justify-center gap-2 py-3 rounded-[10px] text-[0.8125rem] font-bold no-underline transition-all tracking-[0.02em] min-h-12 bg-surface2 border border-accent/10 text-slate-50 hover:bg-white/[0.06] hover:-translate-y-px">
+        <svg class="size-[18px] fill-[#1877F2] shrink-0" viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.35c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Facebook
+      </a>
+    </div>
+
+    <p class="text-center text-[0.75rem] text-muted leading-[1.6] pt-4 border-t border-accent/10">
+      Upload your downloaded image directly to each platform<br>and include <strong>#cmsconf</strong> in your post.
+    </p>
+  </div>
+</div>
+
+<script>
+  // ── Constants ────────────────────────────────────────────────────────────────
+  const CIRCLE_X = 540, CIRCLE_Y = 540, CIRCLE_R = 325;
+  const ROLE_COVER = { x: 255, y: 900, w: 570, h: 130 };
+
+  const THEMES = [
+    { id: 'dark',  name: 'Dark',  bgImage: 'data/images/bg-ocean.png', bg: '#1E293B', accent: '#3CFFD0', fg: '#F9FAFB', fgSub: '#F8FAFC' },
+    { id: 'light', name: 'Light', bgImage: 'data/images/light-bg.png', bg: '#C8E8E8', accent: '#3CFFD0', fg: '#0F172A', fgSub: '#0F172A', logoShape: '#3CFFD0', roleFg: '#0F172A', group: 'light' },
+  ];
+
+  // ── State ────────────────────────────────────────────────────────────────────
+  let currentRole  = 'SPEAKER';
+  let currentTheme = THEMES[0];
+  let userPhoto    = null;
+  let svgTemplate  = null;
+  let photoBgColor    = null;   // null = no fill (transparent PNG stays transparent)
+  let photoScale      = 1.0;
+  let photoMonochrome = false;
+
+  const svgImageCache = new Map();
+  const bgImageCache  = new Map();
+  let rendering    = false;
+  let renderQueued = false;
+
+  const offscreen  = document.createElement('canvas');
+  const canvas     = document.getElementById('canvas');
+
+  // Scale both canvases to the physical pixel density so the preview
+  // is crisp on Retina / HiDPI displays. All drawing code stays in
+  // 1080×1080 logical (CSS) coordinates via offCtx.scale().
+  const dpr = window.devicePixelRatio || 1;
+  offscreen.width  = Math.round(1080 * dpr);
+  offscreen.height = Math.round(1080 * dpr);
+  canvas.width     = Math.round(1080 * dpr);
+  canvas.height    = Math.round(1080 * dpr);
+
+  const offCtx = offscreen.getContext('2d');
+  offCtx.scale(dpr, dpr);
+  const ctx     = canvas.getContext('2d');
+  const overlay = document.getElementById('loadingOverlay');
+
+  // ── Build theme swatches ─────────────────────────────────────────────────────
+  const themeGrid = document.getElementById('themeGrid');
+  THEMES.forEach(theme => {
+    const el = document.createElement('div');
+    el.className = 'theme-swatch rounded-lg overflow-hidden cursor-pointer border-[1.5px] border-transparent transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)]' + (theme.id === currentTheme.id ? ' active' : '');
+    el.title = theme.name;
+    el.innerHTML = `
+      <div class="swatch-color" style="background:${theme.bg}">
+        <div class="swatch-dot" style="background:${theme.accent};box-shadow:0 0 8px ${theme.accent}99"></div>
+      </div>
+      <div class="swatch-label">${theme.name}</div>
+    `;
+    el.addEventListener('click', async () => {
+      document.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active'));
+      el.classList.add('active');
+      currentTheme = theme;
+      if (!bgImageCache.has(theme.id)) {
+        overlay.style.display = '';
+        await loadBgImage(theme).catch(() => {});
+        overlay.style.display = 'none';
+      }
+      scheduleRender();
+    });
+    themeGrid.appendChild(el);
+  });
+
+  // ── Role buttons ─────────────────────────────────────────────────────────────
+  document.querySelectorAll('.role-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentRole = btn.dataset.role;
+      scheduleRender();
+    });
+  });
+
+  // ── Photo upload ─────────────────────────────────────────────────────────────
+  const uploadZone      = document.getElementById('uploadZone');
+  const circleDropZone  = document.getElementById('circleDropZone');
+
+  function bindInput(input) {
+    input.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) handlePhoto(file);
+    });
+  }
+  bindInput(document.getElementById('photoInput'));
+  bindInput(document.getElementById('circlePhotoInput'));
+
+  // Sidebar drag events
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) handlePhoto(file);
+  });
+
+  // Canvas circle drag events
+  circleDropZone.addEventListener('dragover', e => { e.preventDefault(); circleDropZone.classList.add('drag-over'); });
+  circleDropZone.addEventListener('dragleave', () => circleDropZone.classList.remove('drag-over'));
+  circleDropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    circleDropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) handlePhoto(file);
+  });
+
+  function handlePhoto(file) {
+    const isPNG = file.type === 'image/png';
+    const reader = new FileReader();
+    reader.onload = e => {
+      const dataUrl = e.target.result;
+      const img = new Image();
+      img.onload = () => {
+        userPhoto = img;
+
+        // Reset options when a new photo is loaded
+        photoBgColor    = null;
+        photoScale      = 1.0;
+        photoMonochrome = false;
+        setMonochromeToggle(false);
+
+        // Hide the canvas circle overlay — photo is now visible in the canvas
+        circleDropZone.style.display = 'none';
+
+        // Update sidebar zone to show thumbnail
+        uploadZone.innerHTML = `
+          <input type="file" accept="image/*" aria-label="Upload photo" class="absolute inset-0 opacity-0 cursor-pointer size-full">
+          <img src="${dataUrl}" class="upload-thumb" alt="Your photo">
+          <p class="text-[0.73rem] text-accent mt-1">Click to change</p>
+        `;
+        bindInput(uploadZone.querySelector('input'));
+
+        // Show photo options panel
+        document.getElementById('photoOptions').style.display = '';
+
+        // Show bg color picker only for PNGs (may have transparency)
+        const bgSection = document.getElementById('bgColorSection');
+        bgSection.style.display = isPNG ? '' : 'none';
+        if (isPNG) buildBgColorPicker();
+
+        // Reset scale slider
+        const slider = document.getElementById('scaleSlider');
+        slider.value = 100;
+        document.getElementById('scaleDisplay').textContent = '100%';
+
+        scheduleRender();
+      };
+      img.src = dataUrl;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // ── SVG loading & caching ────────────────────────────────────────────────────
+  async function loadTemplate() {
+    try {
+      const [svgRes] = await Promise.all([
+        fetch('data/images/template.svg'),
+        loadBgImage(currentTheme).catch(() => {}),  // prefetch default bg (best-effort)
+      ]);
+      if (!svgRes.ok) throw new Error(`HTTP ${svgRes.status}`);
+      svgTemplate = await svgRes.text();
+      overlay.style.display = 'none';
+      await document.fonts.ready;
+      await getCachedSvgImage(currentTheme);
+      render();
+    } catch {
+      overlay.innerHTML = `
+        <div class="error-box">
+          <div class="error-title">&#9888; Template could not be loaded</div>
+          <p>This app needs to be served over HTTP. Open a terminal in this folder and run:</p>
+          <p class="my-3"><code>npm start</code></p>
+          <p>Then visit <code>http://localhost:3000</code></p>
+        </div>
+      `;
+    }
+  }
+
+  function applyTheme(svgText, theme) {
+    return svgText
+      .replace(/#1E293B/gi, theme.bg)
+      .replace(/#3CFFD0/gi, theme.accent)
+      .replace(/#FEFEFE/gi, theme.logoShape || theme.fg)
+      .replace(/#F9FAFB/gi, theme.fg)
+      .replace(/#F8FAFC/gi, theme.fgSub);
+  }
+
+  function svgToImage(svgText) {
+    return new Promise((resolve, reject) => {
+      const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const img  = new Image();
+      img.onload  = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(); };
+      img.src = url;
+    });
+  }
+
+  async function getCachedSvgImage(theme) {
+    if (svgImageCache.has(theme.id)) return svgImageCache.get(theme.id);
+    const img = await svgToImage(applyTheme(svgTemplate, theme));
+    svgImageCache.set(theme.id, img);
+    return img;
+  }
+
+  async function loadBgImage(theme) {
+    if (bgImageCache.has(theme.id)) return bgImageCache.get(theme.id);
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload  = () => resolve(i);
+      i.onerror = reject;
+      i.src = theme.bgImage;
+    });
+    bgImageCache.set(theme.id, img);
+    return img;
+  }
+
+  // ── Render queue ─────────────────────────────────────────────────────────────
+  function scheduleRender() {
+    if (rendering) { renderQueued = true; return; }
+    doRender();
+  }
+
+  async function doRender() {
+    rendering = true;
+    await render();
+    rendering = false;
+    if (renderQueued) { renderQueued = false; doRender(); }
+  }
+
+  // ── Core render ──────────────────────────────────────────────────────────────
+  async function render() {
+    if (!svgTemplate) return;
+    offCtx.clearRect(0, 0, 1080, 1080);
+
+    // 1. Background image
+    let bgImg = null;
+    try {
+      bgImg = await loadBgImage(currentTheme);
+      offCtx.drawImage(bgImg, 0, 0, 1080, 1080);
+    } catch {
+      offCtx.fillStyle = currentTheme.bg;
+      offCtx.fillRect(0, 0, 1080, 1080);
+    }
+
+    // 2. SVG overlay (logo + circle ring, transparent background)
+    try {
+      const svgImg = await getCachedSvgImage(currentTheme);
+      offCtx.drawImage(svgImg, 0, 0, 1080, 1080);
+    } catch { /* ignore */ }
+
+    // 3. User photo clipped to circle
+    if (userPhoto) {
+      offCtx.save();
+      offCtx.beginPath();
+      offCtx.arc(CIRCLE_X, CIRCLE_Y, CIRCLE_R, 0, Math.PI * 2);
+      offCtx.clip();
+
+      // Fill solid background (useful for transparent PNGs)
+      if (photoBgColor) {
+        offCtx.fillStyle = photoBgColor;
+        offCtx.fillRect(CIRCLE_X - CIRCLE_R, CIRCLE_Y - CIRCLE_R, CIRCLE_R * 2, CIRCLE_R * 2);
+      }
+
+      const baseScale = Math.max(
+        (CIRCLE_R * 2) / userPhoto.naturalWidth,
+        (CIRCLE_R * 2) / userPhoto.naturalHeight
+      );
+      const scale = baseScale * photoScale;
+      const dw = userPhoto.naturalWidth  * scale;
+      const dh = userPhoto.naturalHeight * scale;
+      if (photoMonochrome) offCtx.filter = 'grayscale(1)';
+      offCtx.drawImage(userPhoto, CIRCLE_X - dw / 2, CIRCLE_Y - dh / 2, dw, dh);
+      offCtx.restore();
+    }
+
+    // 4. Role text — cover the SVG's hardcoded text area with background, then draw
+    if (bgImg) {
+      const scaleX = bgImg.naturalWidth  / 1080;
+      const scaleY = bgImg.naturalHeight / 1080;
+      offCtx.drawImage(bgImg,
+        ROLE_COVER.x * scaleX, ROLE_COVER.y * scaleY, ROLE_COVER.w * scaleX, ROLE_COVER.h * scaleY,
+        ROLE_COVER.x, ROLE_COVER.y, ROLE_COVER.w, ROLE_COVER.h);
+    } else {
+      offCtx.fillStyle = currentTheme.bg;
+      offCtx.fillRect(ROLE_COVER.x, ROLE_COVER.y, ROLE_COVER.w, ROLE_COVER.h);
+    }
+    drawRoleText(currentRole);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(offscreen, 0, 0);
+  }
+
+  // ── Role text ────────────────────────────────────────────────────────────────
+  function drawRoleText(role) {
+    const centerX  = 540;
+    const centerY  = 958;
+    const isLight  = currentTheme.group === 'light';
+    const fontSize = role.length >= 8 ? 50 : role.length >= 7 ? 55 : 60;
+    const spacing  = Math.round(fontSize * 0.17);
+
+    offCtx.save();
+    offCtx.font         = `800 ${fontSize}px "Outfit", "Montserrat", "Arial Black", sans-serif`;
+    offCtx.textAlign    = 'left';
+    offCtx.textBaseline = 'middle';
+
+    const chars  = [...role];
+    const widths = chars.map(c => offCtx.measureText(c).width);
+    const total  = widths.reduce((a, b) => a + b, 0) + spacing * (chars.length - 1);
+    let x = centerX - total / 2;
+
+    if (!isLight) {
+      offCtx.lineJoin    = 'round';
+      offCtx.lineWidth   = 9;
+      offCtx.strokeStyle = currentTheme.bg;
+      let ox = x;
+      for (let i = 0; i < chars.length; i++) {
+        offCtx.strokeText(chars[i], ox, centerY);
+        ox += widths[i] + spacing;
+      }
+    }
+
+    offCtx.fillStyle = currentTheme.roleFg || currentTheme.fg;
+    for (let i = 0; i < chars.length; i++) {
+      offCtx.fillText(chars[i], x, centerY);
+      x += widths[i] + spacing;
+    }
+
+    offCtx.restore();
+  }
+
+  // ── Share modal ───────────────────────────────────────────────────────────────
+  const shareModal = document.getElementById('shareModal');
+  const closeModal = document.getElementById('closeModal');
+
+  function buildShareUrls(role) {
+    const tag  = '%23cmsconf';
+    const site = 'https%3A%2F%2Fcmsconf.com';
+    const text = encodeURIComponent(`I'm at CMSConf as a ${role.charAt(0) + role.slice(1).toLowerCase()}! #cmsconf`);
+
+    document.getElementById('shareX').href =
+      `https://twitter.com/intent/tweet?text=${text}&url=${site}`;
+    document.getElementById('shareBluesky').href =
+      `https://bsky.app/intent/compose?text=${text}%20${site}`;
+    document.getElementById('shareLinkedIn').href =
+      `https://www.linkedin.com/sharing/share-offsite/?url=${site}`;
+    document.getElementById('shareFacebook').href =
+      `https://www.facebook.com/sharer/sharer.php?u=${site}&hashtag=${tag}`;
+  }
+
+  function openShareModal() {
+    buildShareUrls(currentRole);
+    shareModal.classList.add('open');
+    shareModal.removeAttribute('aria-hidden');
+    closeModal.focus();
+  }
+
+  function closeShareModal() {
+    shareModal.classList.remove('open');
+    shareModal.setAttribute('aria-hidden', 'true');
+  }
+
+  closeModal.addEventListener('click', closeShareModal);
+  shareModal.addEventListener('click', e => {
+    if (e.target === shareModal) closeShareModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && shareModal.classList.contains('open')) closeShareModal();
+  });
+
+  // ── Download ─────────────────────────────────────────────────────────────────
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    // Always export at exactly 1080×1080 regardless of device DPR
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width  = 1080;
+    exportCanvas.height = 1080;
+    exportCanvas.getContext('2d').drawImage(
+      offscreen, 0, 0, offscreen.width, offscreen.height, 0, 0, 1080, 1080
+    );
+    exportCanvas.toBlob(blob => {
+      const url  = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href     = url;
+      link.download = `cmsconf-${currentRole.toLowerCase()}.png`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      openShareModal();
+    }, 'image/png');
+  });
+
+  // ── Background color picker ───────────────────────────────────────────────────
+  const BG_PRESETS = [
+    { label: 'None (transparent)', color: null },
+    { label: 'White', color: '#FFFFFF' },
+    { label: 'Light gray', color: '#F1F5F9' },
+    { label: 'Dark navy', color: '#1E293B' },
+    { label: 'Black', color: '#000000' },
+  ];
+
+  function buildBgColorPicker() {
+    const container = document.getElementById('bgColorPicker');
+    container.innerHTML = '';
+
+    BG_PRESETS.forEach(preset => {
+      const btn = document.createElement('button');
+      btn.type  = 'button';
+      btn.title = preset.label;
+      const isActive = photoBgColor === preset.color;
+
+      if (preset.color === null) {
+        // "None" — checkerboard transparency indicator
+        btn.style.cssText = `
+          width:2rem;height:2rem;border-radius:50%;border:2px solid ${isActive ? '#3CFFD0' : 'rgba(255,255,255,0.2)'};
+          background: repeating-conic-gradient(#aaa 0% 25%, #fff 0% 50%) 0 0 / 10px 10px;
+          cursor:pointer;transition:transform .15s,border-color .15s;flex-shrink:0;
+        `;
+      } else {
+        btn.style.cssText = `
+          width:2rem;height:2rem;border-radius:50%;border:2px solid ${isActive ? '#3CFFD0' : 'rgba(255,255,255,0.2)'};
+          background:${preset.color};cursor:pointer;transition:transform .15s,border-color .15s;flex-shrink:0;
+        `;
+      }
+
+      btn.addEventListener('click', () => {
+        photoBgColor = preset.color;
+        buildBgColorPicker();
+        scheduleRender();
+      });
+      container.appendChild(btn);
+    });
+
+    // Custom colour input
+    const wrap = document.createElement('label');
+    wrap.title = 'Custom color';
+    wrap.style.cssText = 'width:2rem;height:2rem;border-radius:50%;overflow:hidden;cursor:pointer;border:2px solid rgba(255,255,255,0.2);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);';
+
+    const colorInput = document.createElement('input');
+    colorInput.type  = 'color';
+    colorInput.value = photoBgColor || '#ffffff';
+    colorInput.style.cssText = 'opacity:0;width:100%;height:100%;cursor:pointer;';
+    colorInput.addEventListener('input', e => {
+      photoBgColor = e.target.value;
+      scheduleRender();
+    });
+    wrap.appendChild(colorInput);
+    container.appendChild(wrap);
+  }
+
+  // ── Monochrome toggle ─────────────────────────────────────────────────────────
+  function setMonochromeToggle(on) {
+    const btn   = document.getElementById('monochromeToggle');
+    const thumb = btn.querySelector('span');
+    btn.setAttribute('aria-checked', String(on));
+    btn.style.backgroundColor = on ? 'rgba(60,255,208,0.7)' : '';
+    btn.classList.toggle('bg-white/10', !on);
+    thumb.style.transform  = on ? 'translateX(20px)' : '';
+    thumb.style.background = on ? '#fff' : '';
+  }
+
+  document.getElementById('monochromeToggle').addEventListener('click', () => {
+    photoMonochrome = !photoMonochrome;
+    setMonochromeToggle(photoMonochrome);
+    scheduleRender();
+  });
+
+  // ── Scale slider ──────────────────────────────────────────────────────────────
+  document.getElementById('scaleSlider').addEventListener('input', e => {
+    photoScale = e.target.value / 100;
+    document.getElementById('scaleDisplay').textContent = `${e.target.value}%`;
+    scheduleRender();
+  });
+
+  // ── Init ─────────────────────────────────────────────────────────────────────
+  loadTemplate();
+</script>
+</body>
+</html>

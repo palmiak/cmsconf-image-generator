@@ -1,0 +1,18 @@
+{
+  "name": "cmsconf-image-generator",
+  "version": "1.0.0",
+  "description": "Social image generator for CMSConf attendees, speakers, partners and sponsors",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/input.css -o ./dist/output.css --minify",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "start": "npm run build:css && serve .",
+    "dev": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch & serve . --listen 8080"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.14",
+    "serve": "^14.2.4",
+    "tailwindcss": "^4.3.0"
+  }
+}

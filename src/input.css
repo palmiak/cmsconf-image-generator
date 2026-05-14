@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@source "../index.html";
+
+@theme {
+  --color-bg:      #07101F;
+  --color-surface: #0F1C30;
+  --color-surface2:#172440;
+  --color-accent:  #3CFFD0;
+  --color-muted:   #7A90AA;
+  --font-sans: 'Montserrat', system-ui, sans-serif;
+}
+
+/* Font preloader */
+#font-preloader {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+}
+
+/* Custom scrollbar */
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+/* Grid dot pattern in preview */
+.preview-area::before {
+  content: '';
+  @apply absolute inset-0 pointer-events-none;
+  background-image:
+    linear-gradient(rgba(60,255,208,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(60,255,208,0.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* JS-toggled states */
+.upload-zone.drag-over    { @apply border-accent/40 bg-accent/10; }
+.role-btn.active           { @apply border-accent bg-accent/10 text-accent; }
+.theme-swatch.active {
+  @apply border-accent -translate-y-0.5;
+  box-shadow: 0 0 0 3px rgba(60,255,208,0.1), 0 8px 20px rgba(0,0,0,0.3);
+}
+#circleDropZone.drag-over { @apply border-accent/60; }
+#circleDropZone.drag-over .circle-drop-inner { @apply bg-accent/10; }
+
+.modal-backdrop.open           { @apply opacity-100 pointer-events-auto; }
+.modal-backdrop.open .modal-card { @apply translate-y-0 scale-100; }
+
+/* Classes used in JS-generated HTML (theme swatches, upload thumb, error) */
+.swatch-color { @apply h-[52px] flex items-end p-2; }
+.swatch-dot   { @apply size-3.5 rounded-full shrink-0; }
+.swatch-label { @apply text-[0.6875rem] font-semibold text-muted text-center py-[5px] bg-surface2 tracking-[0.02em]; }
+
+.upload-thumb {
+  @apply size-20 rounded-full object-cover mx-auto mb-2.5 border-2 border-accent;
+  box-shadow: 0 0 0 4px rgba(60,255,208,0.1);
+}
+
+.error-box   { @apply text-center p-8 max-w-xs; }
+.error-title { @apply text-red-400 font-bold text-[0.9375rem] mb-3; }
+.error-box p { @apply text-muted text-[0.8125rem] leading-relaxed; }
+.error-box code {
+  @apply bg-surface2 px-2 py-0.5 rounded font-mono text-accent text-[0.8125rem] inline-block my-1;
+}
