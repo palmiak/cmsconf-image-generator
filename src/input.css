@@ -2,6 +2,14 @@
 
 @source "../index.html";
 
+@font-face {
+  font-family: 'Clash Display';
+  src: url('../data/fonts/ClashDisplay-Variable.woff2') format('woff2');
+  font-weight: 200 700;
+  font-display: swap;
+  font-style: normal;
+}
+
 @theme {
   --color-bg:      #07101F;
   --color-surface: #0F1C30;
@@ -9,6 +17,7 @@
   --color-accent:  #3CFFD0;
   --color-muted:   #7A90AA;
   --font-sans: 'Montserrat', system-ui, sans-serif;
+  --font-display: 'Clash Display', system-ui, sans-serif;
 }
 
 /* Font preloader */
@@ -16,8 +25,8 @@
   position: absolute;
   visibility: hidden;
   pointer-events: none;
-  font-family: 'Outfit', sans-serif;
-  font-weight: 800;
+  font-family: 'Clash Display', sans-serif;
+  font-weight: 700;
 }
 
 /* Custom scrollbar */

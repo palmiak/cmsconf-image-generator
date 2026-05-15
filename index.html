@@ -3,15 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CMSConf Image Generator</title>
+  <title>CMS Conf 2026 — Social Image Generator</title>
+  <meta name="description" content="Create your personalised CMS Conf 2026 social image. Pick your role — Speaker, Attendee, Partner or Sponsor — customise your photo and share it on social media with #cmsconf.">
+  <meta property="og:title" content="CMS Conf 2026 — Social Image Generator">
+  <meta property="og:description" content="Create your personalised CMS Conf 2026 social image. Pick your role — Speaker, Attendee, Partner or Sponsor — customise your photo and share it on social media with #cmsconf.">
+  <meta property="og:image" content="https://cmsconf.com/_astro/ogimage.CN6pKpLP_Z1IqOMW.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CMS Conf">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@cmsconf">
+  <meta name="twitter:title" content="CMS Conf 2026 — Social Image Generator">
+  <meta name="twitter:description" content="Create your personalised CMS Conf 2026 social image. Pick your role — Speaker, Attendee, Partner or Sponsor — customise your photo and share it on social media with #cmsconf.">
+  <meta name="twitter:image" content="https://cmsconf.com/_astro/ogimage.CN6pKpLP_Z1IqOMW.jpg">
+  <link rel="icon" type="image/svg+xml" href="data/images/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="dist/output.css">
 </head>
 <body class="font-sans bg-bg text-slate-50 min-h-dvh flex flex-col antialiased">
 
 <span id="font-preloader" aria-hidden="true">SPEAKER PARTNER ATTENDEE SPONSOR</span>
+<span aria-hidden="true" style="position:absolute;visibility:hidden;pointer-events:none;font-family:'Clash Display';font-weight:700;">preload</span>
 
 <header class="h-[58px] px-5 border-b border-accent/10 bg-surface flex items-center justify-between shrink-0 gap-4">
   <a href="https://cmsconf.com" target="_blank" rel="noopener noreferrer" class="flex items-center shrink-0" aria-label="CMSConf homepage">
@@ -33,7 +46,7 @@
 
       <!-- Photo -->
       <div class="flex flex-col gap-2.5">
-        <div class="text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Your Photo</div>
+        <div class="font-display text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Your Photo</div>
         <div class="upload-zone border-[1.5px] border-dashed border-accent/15 rounded-xl p-6 text-center cursor-pointer relative bg-white/[0.02] transition-colors hover:border-accent/30 hover:bg-accent/10" id="uploadZone">
           <input type="file" id="photoInput" accept="image/*" aria-label="Upload your photo" class="absolute inset-0 opacity-0 cursor-pointer size-full">
           <div class="size-11 rounded-[10px] bg-accent/10 border border-accent/30 flex items-center justify-center mx-auto mb-3">
@@ -54,14 +67,14 @@
 
         <!-- Background color — visible only for transparent PNGs -->
         <div id="bgColorSection" class="flex flex-col gap-2.5" style="display:none">
-          <div class="text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Background Color</div>
+          <div class="font-display text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Background Color</div>
           <div class="flex gap-2 flex-wrap items-center" id="bgColorPicker"></div>
         </div>
 
         <!-- Scale slider -->
         <div class="flex flex-col gap-2">
           <div class="flex items-center justify-between">
-            <div class="text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Photo Scale</div>
+            <div class="font-display text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Photo Scale</div>
             <span id="scaleDisplay" class="text-[0.6875rem] font-mono font-semibold text-accent">100%</span>
           </div>
           <input type="range" id="scaleSlider" min="50" max="150" value="100" step="1"
@@ -70,7 +83,7 @@
 
         <!-- Monochrome toggle -->
         <div class="flex items-center justify-between">
-          <div class="text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Monochrome</div>
+          <div class="font-display text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Monochrome</div>
           <button type="button" id="monochromeToggle"
             role="switch" aria-checked="false"
             class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 bg-white/10">
@@ -83,7 +96,7 @@
 
       <!-- Role -->
       <div class="flex flex-col gap-2.5">
-        <div class="text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Role</div>
+        <div class="font-display text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Role</div>
         <div class="grid grid-cols-2 gap-1.5">
           <button type="button" class="role-btn active bg-white/[0.03] border-[1.5px] border-accent/10 rounded-lg text-muted py-2.5 text-[0.75rem] font-bold tracking-[0.08em] uppercase transition-all leading-none min-h-11 hover:border-accent/30 hover:text-slate-50 hover:bg-accent/[0.04]" data-role="SPEAKER">Speaker</button>
           <button type="button" class="role-btn bg-white/[0.03] border-[1.5px] border-accent/10 rounded-lg text-muted py-2.5 text-[0.75rem] font-bold tracking-[0.08em] uppercase transition-all leading-none min-h-11 hover:border-accent/30 hover:text-slate-50 hover:bg-accent/[0.04]" data-role="PARTNER">Partner</button>
@@ -96,7 +109,7 @@
 
       <!-- Themes -->
       <div class="flex flex-col gap-2.5">
-        <div class="text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Color Theme</div>
+        <div class="font-display text-[0.6875rem] font-bold text-muted uppercase tracking-[0.12em]">Color Theme</div>
         <div class="grid grid-cols-2 gap-1.5" id="themeGrid"></div>
       </div>
 
@@ -167,7 +180,7 @@
       </svg>
     </div>
 
-    <h2 id="shareModalTitle" class="text-xl font-extrabold text-center mb-2 tracking-tight">Image downloaded!</h2>
+    <h2 id="shareModalTitle" class="font-display text-xl font-extrabold text-center mb-2 tracking-tight">Image downloaded!</h2>
     <p class="text-center text-muted text-sm leading-6 mb-6">
       Share it on social media with&nbsp;<strong class="text-accent font-bold">#cmsconf</strong><br>
       and let the world know you&rsquo;re part of it.
@@ -509,7 +522,7 @@
     const spacing  = Math.round(fontSize * 0.17);
 
     offCtx.save();
-    offCtx.font         = `800 ${fontSize}px "Outfit", "Montserrat", "Arial Black", sans-serif`;
+    offCtx.font         = `600 ${fontSize}px "Clash Display", "Montserrat", "Arial Black", sans-serif`;
     offCtx.textAlign    = 'left';
     offCtx.textBaseline = 'middle';
 
