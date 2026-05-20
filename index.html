@@ -603,11 +603,11 @@
       const url  = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href     = url;
-      link.download = `cmsconf-${currentRole.toLowerCase()}.png`;
+      link.download = `cmsconf-${currentRole.toLowerCase()}.jpg`;
       link.click();
       setTimeout(() => URL.revokeObjectURL(url), 5000);
       openShareModal();
-    }, 'image/png');
+    }, 'image/jpeg', 0.92);
   });
 
   // ── Background color picker ───────────────────────────────────────────────────
