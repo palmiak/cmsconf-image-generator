@@ -20,6 +20,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="dist/output.css">
+  <style>
+    .upload-zone:focus-within {
+      border-color: rgba(60,255,208,0.5);
+      background-color: rgba(60,255,208,0.06);
+    }
+    .theme-swatch:focus-visible {
+      outline: 2px solid #3CFFD0;
+      outline-offset: 3px;
+    }
+    #circleDropZone:focus-within {
+      border-color: rgba(60,255,208,0.6);
+    }
+  </style>
 </head>
 <body class="font-sans bg-bg text-slate-50 min-h-dvh flex flex-col antialiased">
 
@@ -261,9 +274,12 @@
   // ── Build theme swatches ─────────────────────────────────────────────────────
   const themeGrid = document.getElementById('themeGrid');
   THEMES.forEach(theme => {
-    const el = document.createElement('div');
+    const el = document.createElement('button');
+    el.type = 'button';
     el.className = 'theme-swatch rounded-lg overflow-hidden cursor-pointer border-[1.5px] border-transparent transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.3)]' + (theme.id === currentTheme.id ? ' active' : '');
     el.title = theme.name;
+    el.setAttribute('aria-label', theme.name + ' theme');
+    el.setAttribute('aria-pressed', theme.id === currentTheme.id ? 'true' : 'false');
     el.innerHTML = `
       <div class="swatch-color" style="background:${theme.bg}">
         <div class="swatch-dot" style="background:${theme.accent};box-shadow:0 0 8px ${theme.accent}99"></div>
@@ -271,8 +287,9 @@
       <div class="swatch-label">${theme.name}</div>
     `;
     el.addEventListener('click', async () => {
-      document.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.theme-swatch').forEach(s => { s.classList.remove('active'); s.setAttribute('aria-pressed', 'false'); });
       el.classList.add('active');
+      el.setAttribute('aria-pressed', 'true');
       currentTheme = theme;
       if (!bgImageCache.has(theme.id)) {
         overlay.style.display = '';
@@ -556,6 +573,11 @@
   // ── Share modal ───────────────────────────────────────────────────────────────
   const shareModal = document.getElementById('shareModal');
   const closeModal = document.getElementById('closeModal');
+  let modalPreviousFocus = null;
+
+  function getFocusableModalElements() {
+    return [...shareModal.querySelectorAll('button:not([disabled]), a[href]')];
+  }
 
   function buildShareUrls(role) {
     const tag  = '%23cmsconf';
@@ -574,6 +596,7 @@
 
   function openShareModal() {
     buildShareUrls(currentRole);
+    modalPreviousFocus = document.activeElement;
     shareModal.classList.add('open');
     shareModal.removeAttribute('aria-hidden');
     closeModal.focus();
@@ -582,6 +605,7 @@
   function closeShareModal() {
     shareModal.classList.remove('open');
     shareModal.setAttribute('aria-hidden', 'true');
+    if (modalPreviousFocus) { modalPreviousFocus.focus(); modalPreviousFocus = null; }
   }
 
   closeModal.addEventListener('click', closeShareModal);
@@ -589,7 +613,17 @@
     if (e.target === shareModal) closeShareModal();
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && shareModal.classList.contains('open')) closeShareModal();
+    if (e.key === 'Escape' && shareModal.classList.contains('open')) { closeShareModal(); return; }
+    if (e.key === 'Tab' && shareModal.classList.contains('open')) {
+      const focusable = getFocusableModalElements();
+      const first = focusable[0];
+      const last  = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+      }
+    }
   });
 
   // ── Download ─────────────────────────────────────────────────────────────────
