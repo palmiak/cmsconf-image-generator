@@ -152,12 +152,11 @@
           <div class="text-muted text-[0.8125rem] font-medium">Loading template&hellip;</div>
         </div>
 
-        <!-- Circle photo upload zone
-             Positioned to match canvas circle: cx=540 cy=540 r=325 on 1080×1080
-             → width/height = 650/1080 = 60.185%  top/left = 215/1080 = 19.907% -->
+        <!-- Photo upload zone
+             Positioned to match the canvas photo frame: x=0 y=277 w=752 h=723 on 1080×1080 -->
         <div id="circleDropZone"
-          class="group absolute rounded-full overflow-hidden cursor-pointer border-2 border-dashed border-accent/20 transition-all z-20 hover:border-accent/50"
-          style="width:60.185%;height:60.185%;top:19.907%;left:19.907%">
+          class="group absolute rounded-l-md overflow-hidden cursor-pointer border-2 border-dashed border-accent/20 transition-all z-20 hover:border-accent/50"
+          style="width:69.630%;height:66.944%;top:25.648%;left:0">
           <input type="file" id="circlePhotoInput" accept="image/*" aria-label="Upload your photo"
             class="absolute inset-0 opacity-0 cursor-pointer size-full z-10">
           <div class="circle-drop-inner absolute inset-0 flex flex-col items-center justify-center gap-2
@@ -232,25 +231,23 @@
 
 <script>
   // ── Constants ────────────────────────────────────────────────────────────────
-  const CIRCLE_X = 540, CIRCLE_Y = 540, CIRCLE_R = 325;
-  const ROLE_COVER = { x: 255, y: 900, w: 570, h: 130 };
+  const PHOTO = { x: 0, y: 277, w: 752, h: 723, r: 6 };
+  const ROLE  = { right: 1000, y: 143, maxW: 330 };
 
   const THEMES = [
-    { id: 'dark',  name: 'Dark',  bgImage: 'data/images/bg-ocean.png', bg: '#1E293B', accent: '#3CFFD0', fg: '#F9FAFB', fgSub: '#F8FAFC' },
-    { id: 'light', name: 'Light', bgImage: 'data/images/light-bg.png', bg: '#C8E8E8', accent: '#3CFFD0', fg: '#0F172A', fgSub: '#0F172A', logoShape: '#3CFFD0', roleFg: '#0F172A', group: 'light' },
+    { id: 'dark',  name: 'Dark',  base: 'data/images/template-dark.svg',  overlay: 'data/images/overlay-dark.svg',  bg: '#0F172A', accent: '#27F0D4', roleFg: '#27F0D4' },
+    { id: 'light', name: 'Light', base: 'data/images/template-light.svg', overlay: 'data/images/overlay-light.svg', bg: '#F8FAFC', accent: '#27F0D4', roleFg: '#020617' },
   ];
 
   // ── State ────────────────────────────────────────────────────────────────────
   let currentRole  = 'SPEAKER';
   let currentTheme = THEMES[0];
   let userPhoto    = null;
-  let svgTemplate  = null;
   let photoBgColor    = null;   // null = no fill (transparent PNG stays transparent)
   let photoScale      = 1.0;
   let photoMonochrome = false;
 
-  const svgImageCache = new Map();
-  const bgImageCache  = new Map();
+  const layerCache = new Map();   // theme.id → { base, overlay }
   let rendering    = false;
   let renderQueued = false;
 
@@ -291,9 +288,9 @@
       el.classList.add('active');
       el.setAttribute('aria-pressed', 'true');
       currentTheme = theme;
-      if (!bgImageCache.has(theme.id)) {
+      if (!layerCache.has(theme.id)) {
         overlay.style.display = '';
-        await loadBgImage(theme).catch(() => {});
+        await loadLayers(theme).catch(() => {});
         overlay.style.display = 'none';
       }
       scheduleRender();
@@ -392,18 +389,29 @@
 
   function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  // ── SVG loading & caching ────────────────────────────────────────────────────
+  // ── SVG layer loading & caching ──────────────────────────────────────────────
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload  = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  async function loadLayers(theme) {
+    if (!layerCache.has(theme.id)) {
+      const [base, top] = await Promise.all([loadImage(theme.base), loadImage(theme.overlay)]);
+      layerCache.set(theme.id, { base, overlay: top });
+    }
+    return layerCache.get(theme.id);
+  }
+
   async function loadTemplate() {
     try {
-      const [svgRes] = await Promise.all([
-        fetch('data/images/template.svg'),
-        loadBgImage(currentTheme).catch(() => {}),  // prefetch default bg (best-effort)
-      ]);
-      if (!svgRes.ok) throw new Error(`HTTP ${svgRes.status}`);
-      svgTemplate = await svgRes.text();
-      overlay.style.display = 'none';
       await document.fonts.ready;
-      await getCachedSvgImage(currentTheme);
+      await loadLayers(currentTheme);
+      overlay.style.display = 'none';
       render();
     } catch {
       overlay.innerHTML = `
@@ -411,49 +419,10 @@
           <div class="error-title">&#9888; Template could not be loaded</div>
           <p>This app needs to be served over HTTP. Open a terminal in this folder and run:</p>
           <p class="my-3"><code>npm start</code></p>
-          <p>Then visit <code>http://localhost:3000</code></p>
+          <p>Then visit <code>http://localhost:8080</code></p>
         </div>
       `;
     }
-  }
-
-  function applyTheme(svgText, theme) {
-    return svgText
-      .replace(/#1E293B/gi, theme.bg)
-      .replace(/#3CFFD0/gi, theme.accent)
-      .replace(/#FEFEFE/gi, theme.logoShape || theme.fg)
-      .replace(/#F9FAFB/gi, theme.fg)
-      .replace(/#F8FAFC/gi, theme.fgSub);
-  }
-
-  function svgToImage(svgText) {
-    return new Promise((resolve, reject) => {
-      const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
-      const url  = URL.createObjectURL(blob);
-      const img  = new Image();
-      img.onload  = () => { URL.revokeObjectURL(url); resolve(img); };
-      img.onerror = () => { URL.revokeObjectURL(url); reject(); };
-      img.src = url;
-    });
-  }
-
-  async function getCachedSvgImage(theme) {
-    if (svgImageCache.has(theme.id)) return svgImageCache.get(theme.id);
-    const img = await svgToImage(applyTheme(svgTemplate, theme));
-    svgImageCache.set(theme.id, img);
-    return img;
-  }
-
-  async function loadBgImage(theme) {
-    if (bgImageCache.has(theme.id)) return bgImageCache.get(theme.id);
-    const img = await new Promise((resolve, reject) => {
-      const i = new Image();
-      i.onload  = () => resolve(i);
-      i.onerror = reject;
-      i.src = theme.bgImage;
-    });
-    bgImageCache.set(theme.id, img);
-    return img;
   }
 
   // ── Render queue ─────────────────────────────────────────────────────────────
@@ -471,61 +440,47 @@
 
   // ── Core render ──────────────────────────────────────────────────────────────
   async function render() {
-    if (!svgTemplate) return;
+    let layers;
+    try { layers = await loadLayers(currentTheme); } catch { return; }
     offCtx.clearRect(0, 0, 1080, 1080);
 
-    // 1. Background image
-    let bgImg = null;
-    try {
-      bgImg = await loadBgImage(currentTheme);
-      offCtx.drawImage(bgImg, 0, 0, 1080, 1080);
-    } catch {
-      offCtx.fillStyle = currentTheme.bg;
-      offCtx.fillRect(0, 0, 1080, 1080);
-    }
+    // 1. Background + logo
+    offCtx.drawImage(layers.base, 0, 0, 1080, 1080);
 
-    // 2. SVG overlay (logo + circle ring, transparent background)
-    try {
-      const svgImg = await getCachedSvgImage(currentTheme);
-      offCtx.drawImage(svgImg, 0, 0, 1080, 1080);
-    } catch { /* ignore */ }
-
-    // 3. User photo clipped to circle
+    // 2. User photo cropped to the frame (rounded on the left corners only)
     if (userPhoto) {
+      const { x, y, w, h, r } = PHOTO;
       offCtx.save();
       offCtx.beginPath();
-      offCtx.arc(CIRCLE_X, CIRCLE_Y, CIRCLE_R, 0, Math.PI * 2);
+      offCtx.moveTo(x + r, y);
+      offCtx.lineTo(x + w, y);
+      offCtx.lineTo(x + w, y + h);
+      offCtx.lineTo(x + r, y + h);
+      offCtx.arcTo(x, y + h, x, y + h - r, r);
+      offCtx.lineTo(x, y + r);
+      offCtx.arcTo(x, y, x + r, y, r);
+      offCtx.closePath();
       offCtx.clip();
 
       // Fill solid background (useful for transparent PNGs)
       if (photoBgColor) {
         offCtx.fillStyle = photoBgColor;
-        offCtx.fillRect(CIRCLE_X - CIRCLE_R, CIRCLE_Y - CIRCLE_R, CIRCLE_R * 2, CIRCLE_R * 2);
+        offCtx.fillRect(x, y, w, h);
       }
 
-      const baseScale = Math.max(
-        (CIRCLE_R * 2) / userPhoto.naturalWidth,
-        (CIRCLE_R * 2) / userPhoto.naturalHeight
-      );
+      const baseScale = Math.max(w / userPhoto.naturalWidth, h / userPhoto.naturalHeight);
       const scale = baseScale * photoScale;
       const dw = userPhoto.naturalWidth  * scale;
       const dh = userPhoto.naturalHeight * scale;
       if (photoMonochrome) offCtx.filter = 'grayscale(1)';
-      offCtx.drawImage(userPhoto, CIRCLE_X - dw / 2, CIRCLE_Y - dh / 2, dw, dh);
+      offCtx.drawImage(userPhoto, x + w / 2 - dw / 2, y + h / 2 - dh / 2, dw, dh);
       offCtx.restore();
     }
 
-    // 4. Role text — cover the SVG's hardcoded text area with background, then draw
-    if (bgImg) {
-      const scaleX = bgImg.naturalWidth  / 1080;
-      const scaleY = bgImg.naturalHeight / 1080;
-      offCtx.drawImage(bgImg,
-        ROLE_COVER.x * scaleX, ROLE_COVER.y * scaleY, ROLE_COVER.w * scaleX, ROLE_COVER.h * scaleY,
-        ROLE_COVER.x, ROLE_COVER.y, ROLE_COVER.w, ROLE_COVER.h);
-    } else {
-      offCtx.fillStyle = currentTheme.bg;
-      offCtx.fillRect(ROLE_COVER.x, ROLE_COVER.y, ROLE_COVER.w, ROLE_COVER.h);
-    }
+    // 3. Asterisk overlaps the photo
+    offCtx.drawImage(layers.overlay, 0, 0, 1080, 1080);
+
+    // 4. Role title
     drawRoleText(currentRole);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -534,39 +489,18 @@
 
   // ── Role text ────────────────────────────────────────────────────────────────
   function drawRoleText(role) {
-    const centerX  = 540;
-    const centerY  = 958;
-    const isLight  = currentTheme.group === 'light';
-    const fontSize = role.length >= 8 ? 50 : role.length >= 7 ? 55 : 60;
-    const spacing  = Math.round(fontSize * 0.17);
+    const text = role.toLowerCase();
+    let fontSize = 72;
 
     offCtx.save();
-    offCtx.font         = `600 ${fontSize}px "Clash Display", "Montserrat", "Arial Black", sans-serif`;
-    offCtx.textAlign    = 'left';
+    offCtx.textAlign    = 'right';
     offCtx.textBaseline = 'middle';
-
-    const chars  = [...role];
-    const widths = chars.map(c => offCtx.measureText(c).width);
-    const total  = widths.reduce((a, b) => a + b, 0) + spacing * (chars.length - 1);
-    let x = centerX - total / 2;
-
-    if (!isLight) {
-      offCtx.lineJoin    = 'round';
-      offCtx.lineWidth   = 9;
-      offCtx.strokeStyle = currentTheme.bg;
-      let ox = x;
-      for (let i = 0; i < chars.length; i++) {
-        offCtx.strokeText(chars[i], ox, centerY);
-        ox += widths[i] + spacing;
-      }
-    }
-
-    offCtx.fillStyle = currentTheme.roleFg || currentTheme.fg;
-    for (let i = 0; i < chars.length; i++) {
-      offCtx.fillText(chars[i], x, centerY);
-      x += widths[i] + spacing;
-    }
-
+    offCtx.fillStyle    = currentTheme.roleFg;
+    const setFont = () => { offCtx.font = `500 ${fontSize}px "Clash Display", "Montserrat", "Arial Black", sans-serif`; };
+    setFont();
+    const measured = offCtx.measureText(text).width;
+    if (measured > ROLE.maxW) { fontSize = Math.floor(fontSize * ROLE.maxW / measured); setFont(); }
+    offCtx.fillText(text, ROLE.right, ROLE.y);
     offCtx.restore();
   }
 
